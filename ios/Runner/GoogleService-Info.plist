@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>898392589052-cnn2uoi1avoq1hca0p23ausm5ft70q58.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.898392589052-cnn2uoi1avoq1hca0p23ausm5ft70q58</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA8GrVlJitZRBVU3hwc7uYRmnBX8GlrIQw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>898392589052</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.fypWhatYouCookToday</string>
+	<key>PROJECT_ID</key>
+	<string>fyp-what-you-cook-today</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fyp-what-you-cook-today.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:898392589052:ios:b787c5bf9000e07f2b0d79</string>
+</dict>
+</plist>

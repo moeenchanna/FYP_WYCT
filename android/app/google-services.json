@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "898392589052",
+    "project_id": "fyp-what-you-cook-today",
+    "storage_bucket": "fyp-what-you-cook-today.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898392589052:android:76a313c5a031bb932b0d79",
+        "android_client_info": {
+          "package_name": "com.example.fyp_what_you_cook_today"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "898392589052-voj9qbndq2247iah2vohjgb6ut1gj0or.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-QWRqBzm4msRFhnwW5gNMKJtGPmjI9PE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "898392589052-voj9qbndq2247iah2vohjgb6ut1gj0or.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -441,6 +441,7 @@ class FirebaseDatabaseService {
               productPrice: productPrice,
               productPicture: productPicture,
               numberOfPersons: numberOfPersons,
+              orderStatus: "Processing",
               createdAt: DateTime.now());
 
           Map<String, dynamic> orderMap = orderModel.toMap();
@@ -459,8 +460,6 @@ class FirebaseDatabaseService {
                   title: "Success",
                   message: "Order Submitted Successfully",
                 );
-
-               
               },
             );
           } catch (error) {
@@ -480,5 +479,50 @@ class FirebaseDatabaseService {
         }
       },
     );
+  }
+
+   updateOrderStatusByAdmin(
+      BuildContext context, String orderId, String status) {
+    // Define data to be updated
+    Map<String, dynamic> updateData = {
+      'orderStatus': status,
+      'createdAt': DateTime.now(),
+    };
+    orderCollectionReference
+        .doc(orderId)
+        .update(updateData)
+        .then((value) async => {
+              log("Status Updated"),
+               Navigator.pop(context),
+              if (status.contains("Rejected"))
+                {
+                  HelperUtils.showSnackBar(
+                    context: context,
+                    isSuccess: false,
+                    title: "Order Reject",
+                    message: "Order Rejected Successfully",
+                  ),
+                  
+                }
+              else if (status.contains("Delivered"))
+                {
+                  HelperUtils.showSnackBar(
+                    context: context,
+                    isSuccess: true,
+                    title: "Order Deliverer",
+                    message: "Order is ready to go",
+                  ),
+                }
+              else
+                {
+                  HelperUtils.showSnackBar(
+                    context: context,
+                    isSuccess: true,
+                    title: "Order Accepted",
+                    message: "Order Accepted Successfully",
+                  ),
+                }
+            })
+        .catchError((error) => log("Failed to update user: $error"));
   }
 }

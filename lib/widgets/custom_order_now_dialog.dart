@@ -35,9 +35,9 @@ class CustomOrderNowDialog extends StatelessWidget {
           children: <Widget>[
             Image.network(
               productPicture,
-              height: 250,
+             height: 200,
               width: double.infinity,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
             ),
             const SizedBox(height: 10),
             Text(

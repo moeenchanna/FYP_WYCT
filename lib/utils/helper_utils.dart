@@ -46,4 +46,18 @@ class HelperUtils {
     return uniqueID;
   }
 
+  static Color getOrderStatusColor(String orderStatus) {
+    switch (orderStatus) {
+      case "Processing":
+        return AppColors.processing;
+      case "Accepted":
+        return AppColors.accepted;
+      case "Delivered":
+        return AppColors.delivered;
+      case "Rejected":
+        return AppColors.rejected;
+      default:
+        return AppColors.primaryDark;
+    }
+  }
 }

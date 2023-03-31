@@ -12,6 +12,7 @@ class OrderModel {
   String productPrice;
   String productPicture;
   String numberOfPersons;
+  String orderStatus;
   DateTime createdAt;
 
   OrderModel({
@@ -28,6 +29,7 @@ class OrderModel {
     required this.productPrice,
     required this.productPicture,
     required this.numberOfPersons,
+    required this.orderStatus,
     required this.createdAt,
   });
 
@@ -46,6 +48,7 @@ class OrderModel {
       'productPrice': productPrice,
       'productPicture': productPicture,
       'numberOfPersons': numberOfPersons,
+      'orderStatus': orderStatus,
       'createdAt': createdAt,
     };
   }
@@ -65,6 +68,7 @@ class OrderModel {
       productPrice: map['productPrice'],
       productPicture: map['productPicture'],
       numberOfPersons: map['numberOfPersons'],
+      orderStatus: map['orderStatus'],
       createdAt: DateTime.parse(map['createdAt']),
     );
   }

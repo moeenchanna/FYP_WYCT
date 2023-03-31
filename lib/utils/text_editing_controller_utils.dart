@@ -14,5 +14,6 @@ class TextEditingControllers {
   static final orderName = TextEditingController();
   static final orderDetails = TextEditingController();
   static final orderAddress = TextEditingController();
+  static final numberOfPersons = TextEditingController();
 }
 // Access them using `TextEditingControllers.name` etc. 

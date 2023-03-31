@@ -18,6 +18,9 @@ class FirebaseDatabaseService {
   static final CollectionReference productCollectionReference =
       FirebaseFirestore.instance
           .collection(FirebaseConstant.COLLECTION_FOR_PRODUCTS);
+  static final CollectionReference specialOrderCollectionReference =
+      FirebaseFirestore.instance
+          .collection(FirebaseConstant.COLLECTION_FOR_SPECIAL_ORDERS);
 
   Future<void> authenticationUser(
       BuildContext context, String email, String password) async {
@@ -135,6 +138,10 @@ class FirebaseDatabaseService {
       log("Failed to add user: $error");
 
       Navigator.pop(context);
+      TextEditingControllers.name.clear();
+      TextEditingControllers.phone.clear();
+      TextEditingControllers.email.clear();
+      TextEditingControllers.password.clear();
       HelperUtils.showSnackBar(
         context: context,
         isSuccess: false,
@@ -229,10 +236,8 @@ class FirebaseDatabaseService {
   void signOut(BuildContext context) {
     HelperUtils.showCircularProgressDialog(context);
     updateUser(context, false);
-  
   }
 
-  // Updates user data in Firestore
   void updateUser(BuildContext context, bool isActive) {
     // Define data to be updated
     Map<String, dynamic> updateData = {
@@ -245,7 +250,6 @@ class FirebaseDatabaseService {
         .doc(currentUser!.uid)
         .update(updateData)
         .then((value) async => {
-       
               log("User Updated"),
               // If isActive is false, sign out user and navigate to login screen
               if (isActive == false)
@@ -257,7 +261,6 @@ class FirebaseDatabaseService {
                     title: "Signing out",
                     message: "See you soon!",
                   ),
-
                   await _auth.signOut(),
                   Future.delayed(
                       const Duration(
@@ -277,7 +280,7 @@ class FirebaseDatabaseService {
 
   addProductToFireStore(BuildContext context, String productName,
       String productDetail, String productPrice, String productPicture) {
-            HelperUtils.showCircularProgressDialog(context);
+    HelperUtils.showCircularProgressDialog(context);
 
     ProductModel productModel = ProductModel(
         id: HelperUtils.generateUniqueId(),
@@ -315,11 +318,88 @@ class FirebaseDatabaseService {
       log("Failed to add products: $error");
 
       Navigator.pop(context);
+
+      TextEditingControllers.productName.clear();
+      TextEditingControllers.productDetails.clear();
+      TextEditingControllers.productPrice.clear();
+      TextEditingControllers.productPicture.clear();
+
       HelperUtils.showSnackBar(
         context: context,
         isSuccess: false,
         title: "Failed",
         message: "Product Creation Failed. Try Again.",
+      );
+    }
+  }
+
+  addSpecialOrderToFireStore(
+      BuildContext context,
+      String name,
+      String phone,
+      String email,
+      String orderName,
+      String orderDetails,
+      String orderAddress,
+      String numberOfPersons) {
+    HelperUtils.showCircularProgressDialog(context);
+
+    SpecialOrderModel specialOrderModel = SpecialOrderModel(
+        specialOrderId: HelperUtils.generateUniqueId(),
+        customerName: name,
+        customerPhone: phone,
+        customerEmail: email,
+        orderName: orderName,
+        orderDetails: orderDetails,
+        orderAddress: orderAddress,
+        numberOfPersons: numberOfPersons,
+        createdAt: DateTime.now());
+
+    Map<String, dynamic> specialOrderMap = specialOrderModel.toMap();
+    log("Special Order Data $specialOrderMap");
+
+    try {
+      specialOrderCollectionReference
+          .doc(specialOrderModel.specialOrderId)
+          .set(specialOrderMap);
+      Future.delayed(
+        const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
+        () {
+          Navigator.pop(context);
+          TextEditingControllers.name.clear();
+          TextEditingControllers.phone.clear();
+          TextEditingControllers.email.clear();
+          TextEditingControllers.orderName.clear();
+          TextEditingControllers.orderDetails.clear();
+          TextEditingControllers.orderAddress.clear();
+          TextEditingControllers.numberOfPersons.clear();
+
+          HelperUtils.showSnackBar(
+            context: context,
+            isSuccess: true,
+            title: "Success",
+            message: "Special Order Created Successfully",
+          );
+        },
+      );
+    } catch (error) {
+      log("Failed to create special orders: $error");
+
+      Navigator.pop(context);
+
+      TextEditingControllers.name.clear();
+      TextEditingControllers.phone.clear();
+      TextEditingControllers.email.clear();
+      TextEditingControllers.orderName.clear();
+      TextEditingControllers.orderDetails.clear();
+      TextEditingControllers.orderAddress.clear();
+      TextEditingControllers.numberOfPersons.clear();
+
+      HelperUtils.showSnackBar(
+        context: context,
+        isSuccess: false,
+        title: "Failed",
+        message: "Special Order Creation Failed. Try Again.",
       );
     }
   }

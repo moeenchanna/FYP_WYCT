@@ -15,6 +15,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool isAdmin = false;
+  late CollectionReference collectionReference;
 
   @override
   void initState() {
@@ -24,11 +25,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ?.contains(FirebaseConstant.GET_ADMIN) ??
         false;
     FirebaseDatabaseService().updateUser(context, true);
+
+    collectionReference = FirebaseFirestore.instance.collection((isAdmin)
+        ? FirebaseConstant.COLLECTION_FOR_ORDERS
+        : FirebaseConstant.COLLECTION_FOR_PRODUCTS);
+
     super.initState();
   }
 
-  final CollectionReference collectionReference = FirebaseFirestore.instance
-      .collection(FirebaseConstant.COLLECTION_FOR_PRODUCTS);
   Stream<QuerySnapshot> getStream() => collectionReference.snapshots();
 
   @override
@@ -36,23 +40,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       drawer: const CustomDrawer(),
-      appBar: CustomAppBar(title: (isAdmin) ? "ADMIN BOARD" : "DASHBOARD"),
+      appBar: CustomAppBar(
+        title: (isAdmin) ? "ADMIN BOARD" : "DASHBOARD",
+       actions: isAdmin
+           ? [
+               IconButton(
+                 onPressed: () {},
+                 icon: Icon(Icons.diamond),
+               ),
+             ]
+           : [],
+       
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: getStream(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Text(
+              'Error: ${snapshot.error}',
+              style: const TextStyle(
+                  color: AppColors.errorColor, fontWeight: FontWeight.bold),
+            );
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Loading...');
+            return const Center(
+                child: Text('Loading...',
+                    style: TextStyle(
+                        color: AppColors.primaryDark,
+                        fontWeight: FontWeight.bold)));
           }
 
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
-
               // return a ListTile for each document in the collection
               return Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10, top: 8),

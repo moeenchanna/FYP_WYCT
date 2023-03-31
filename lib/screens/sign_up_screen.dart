@@ -13,6 +13,7 @@ class SignUpScreen extends StatelessWidget {
     late String _phone;
     late String _email;
     late String _password;
+    late String _address;
 
     GlobalKey<FormState> key = GlobalKey<FormState>();
 
@@ -66,6 +67,19 @@ class SignUpScreen extends StatelessWidget {
               const SizedBox(
                 height: 20.0,
               ),
+              
+              CustomTextField(
+                controller: TextEditingControllers.orderAddress,
+                labelText: "Address",
+                minimumLines: 2,
+                maximumLines: 3,
+                onChanged: (value) => {_address = value},
+                validator:
+                    ValidationBuilder().maxLength(100).minLength(30).build(),
+              ),
+                const SizedBox(
+                height: 20.0,
+              ),
               SizedBox(
                 height: 40.0,
                 child: CustomButton(
@@ -79,6 +93,7 @@ class SignUpScreen extends StatelessWidget {
                             _phone,
                             _email,
                             _password,
+                            _address
                           )
                         }
                       }

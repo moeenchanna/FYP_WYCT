@@ -9,4 +9,5 @@ class AppColors {
   static const Color successSnackbarColor = Color.fromARGB(255, 0, 188, 56);
   static const Color textColor = Color(0xFFF5F5F5);
   static const Color white = Color(0xFFF5F5F5);
+  static const Color black = Color.fromARGB(255, 0, 0, 0);
 }

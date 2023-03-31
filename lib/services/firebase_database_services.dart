@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,9 @@ class FirebaseDatabaseService {
   static final CollectionReference specialOrderCollectionReference =
       FirebaseFirestore.instance
           .collection(FirebaseConstant.COLLECTION_FOR_SPECIAL_ORDERS);
+  static final CollectionReference orderCollectionReference = FirebaseFirestore
+      .instance
+      .collection(FirebaseConstant.COLLECTION_FOR_ORDERS);
 
   Future<void> authenticationUser(
       BuildContext context, String email, String password) async {
@@ -85,21 +87,22 @@ class FirebaseDatabaseService {
   }
 
   Future<void> registrationUser(BuildContext context, String name, String phone,
-      String email, String password) async {
+      String email, String password, String address) async {
     try {
       HelperUtils.showCircularProgressDialog(context);
       var result = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      onRegistrationSuccess(context, result.user!, name, phone, password);
+      onRegistrationSuccess(
+          context, result.user!, name, phone, password, address);
     } catch (e) {
       onRegistrationFailure(context, e);
     }
   }
 
   void onRegistrationSuccess(BuildContext context, User user, String name,
-      String phone, String password) {
+      String phone, String password, String address) {
     log('Authentication successful');
 
     UserModel userModel = UserModel(
@@ -108,6 +111,7 @@ class FirebaseDatabaseService {
         phone: phone,
         email: user.email.toString(),
         password: password,
+        address: address,
         token: "Not Available",
         active: false,
         lastSeen: DateTime.now(),
@@ -125,6 +129,7 @@ class FirebaseDatabaseService {
           TextEditingControllers.phone.clear();
           TextEditingControllers.email.clear();
           TextEditingControllers.password.clear();
+          TextEditingControllers.orderAddress.clear();
 
           HelperUtils.showSnackBar(
             context: context,
@@ -142,6 +147,8 @@ class FirebaseDatabaseService {
       TextEditingControllers.phone.clear();
       TextEditingControllers.email.clear();
       TextEditingControllers.password.clear();
+      TextEditingControllers.orderAddress.clear();
+
       HelperUtils.showSnackBar(
         context: context,
         isSuccess: false,
@@ -402,5 +409,76 @@ class FirebaseDatabaseService {
         message: "Special Order Creation Failed. Try Again.",
       );
     }
+  }
+
+  addOrderToFireStore(
+    BuildContext context,
+    String productName,
+    String productDetail,
+    String productPrice,
+    String productPicture,
+    String orderPrice,
+    String numberOfPersons,
+  ) async {
+    HelperUtils.showCircularProgressDialog(context);
+
+    customerCollectionReference.doc(currentUser!.uid).get().then(
+      (DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          log('Document data: ${documentSnapshot.data()}');
+          //Navigator.pop(context);
+          OrderModel orderModel = OrderModel(
+              orderId: HelperUtils.generateUniqueId(),
+              customerId: currentUser!.uid,
+              customerName: documentSnapshot.get("name"),
+              customerPhone: documentSnapshot.get("phone"),
+              customerEmail: documentSnapshot.get("email"),
+              customerAddress: documentSnapshot.get("address"),
+              customerFcmToken: documentSnapshot.get("token"),
+              orderPrice: orderPrice,
+              productName: productName,
+              productDetails: productDetail,
+              productPrice: productPrice,
+              productPicture: productPicture,
+              numberOfPersons: numberOfPersons,
+              createdAt: DateTime.now());
+
+          Map<String, dynamic> orderMap = orderModel.toMap();
+          log("Order Data $orderMap");
+
+          try {
+            orderCollectionReference.doc(orderModel.orderId).set(orderMap);
+            Future.delayed(
+              const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
+              () {
+                Navigator.pop(context);
+
+                HelperUtils.showSnackBar(
+                  context: context,
+                  isSuccess: true,
+                  title: "Success",
+                  message: "Order Submitted Successfully",
+                );
+
+               
+              },
+            );
+          } catch (error) {
+            log("Failed to create order: $error");
+
+            Navigator.pop(context);
+
+            HelperUtils.showSnackBar(
+              context: context,
+              isSuccess: false,
+              title: "Failed",
+              message: "Order Submit Failed. Try Again.",
+            );
+          }
+        } else {
+          print('Document does not exist on the database');
+        }
+      },
+    );
   }
 }

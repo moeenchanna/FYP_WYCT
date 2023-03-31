@@ -5,6 +5,7 @@ class UserModel {
   String email;
   String password;
   String token;
+  String address;
   bool active;
   DateTime lastSeen;
   DateTime createdAt;
@@ -16,6 +17,7 @@ class UserModel {
     required this.email,
     required this.password,
     required this.token,
+    required this.address,
     required this.active,
     required this.lastSeen,
     required this.createdAt,
@@ -29,6 +31,7 @@ class UserModel {
       'email': email,
       'password': password,
       'token': token,
+      'address': address,
       'active': active,
       'last_seen': lastSeen,
       'createdAt': createdAt,
@@ -43,6 +46,7 @@ class UserModel {
       email: map['email'],
       password: map['password'],
       token: map['token'],
+      address: map['address'],
       active: map['active'],
       lastSeen: DateTime.parse(map['last_seen']),
       createdAt: DateTime.parse(map['createdAt']),

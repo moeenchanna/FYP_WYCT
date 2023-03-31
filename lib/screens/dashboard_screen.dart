@@ -26,9 +26,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         false;
     FirebaseDatabaseService().updateUser(context, true);
 
-    collectionReference = FirebaseFirestore.instance.collection((isAdmin)
-        ? FirebaseConstant.COLLECTION_FOR_ORDERS
-        : FirebaseConstant.COLLECTION_FOR_PRODUCTS);
+    collectionReference = FirebaseFirestore.instance.collection(
+        FirebaseConstant.COLLECTION_FOR_PRODUCTS);
 
     super.initState();
   }
@@ -42,14 +41,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       drawer: const CustomDrawer(),
       appBar: CustomAppBar(
         title: (isAdmin) ? "ADMIN BOARD" : "DASHBOARD",
-       actions: isAdmin
-           ? [
-               IconButton(
-                 onPressed: () {},
-                 icon: Icon(Icons.diamond),
-               ),
-             ]
-           : [],
        
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -76,36 +67,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
               // return a ListTile for each document in the collection
-              return Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10, top: 8),
-                child: Card(
-                  color: AppColors.primaryDark,
-                  elevation: 2,
-                  child: ListTile(
-                    title: Text(
-                      data['name'],
-                      style: const TextStyle(
-                          color: AppColors.textColor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      "Details: ${data['details']}",
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.textColor,
+              return GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CustomOrderNowDialog(
+                          productId: data['id'],
+                          productName: data['name'],
+                          productDetail: data['details'],
+                          productPrice: data['price'],
+                          productPicture: data['pictureLink']);
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 8),
+                  child: Card(
+                    color: AppColors.primaryDark,
+                    elevation: 2,
+                    child: ListTile(
+                      title: Text(
+                        data['name'],
+                        style: const TextStyle(
+                            color: AppColors.textColor,
+                            fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    trailing: Text(
-                      "Rs: ${data['price']}",
-                      style: const TextStyle(
+                      subtitle: Text(
+                        "Details: ${data['details']}",
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
                           color: AppColors.textColor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    leading: CircleAvatar(
-                      radius: 35.0, // Image radius
-                      backgroundImage: NetworkImage(data['pictureLink']),
-                      backgroundColor: AppColors.white,
+                        ),
+                      ),
+                      trailing: Text(
+                        "Rs: ${data['price']}",
+                        style: const TextStyle(
+                            color: AppColors.textColor,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      leading: CircleAvatar(
+                        radius: 35.0, // Image radius
+                        backgroundImage: NetworkImage(data['pictureLink']),
+                        backgroundColor: AppColors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -114,6 +120,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           );
         },
       ),
+  
       floatingActionButton: CustomFloatingActionButton(
         label: (isAdmin) ? "Add Product" : "Special Order",
         iconData:

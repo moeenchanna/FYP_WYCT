@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'screens/screens.dart';
+import 'utils/utils.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
@@ -13,7 +14,7 @@ late final FirebaseAuth auth;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await NotificationHelper().configure();
   // Initializes Firebase with default settings using the current platform
   app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

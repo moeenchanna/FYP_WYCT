@@ -6,26 +6,27 @@ import '../constant/constant.dart';
 import '../model/models.dart';
 import '../screens/screens.dart';
 import '../utils/utils.dart';
+import 'package:http/http.dart' as http;
 
 class FirebaseDatabaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
   static final CollectionReference customerCollectionReference =
-      FirebaseFirestore.instance
-          .collection(FirebaseConstant.COLLECTION_FOR_CUSTOMERS);
+  FirebaseFirestore.instance
+      .collection(FirebaseConstant.COLLECTION_FOR_CUSTOMERS);
   static final CollectionReference productCollectionReference =
-      FirebaseFirestore.instance
-          .collection(FirebaseConstant.COLLECTION_FOR_PRODUCTS);
+  FirebaseFirestore.instance
+      .collection(FirebaseConstant.COLLECTION_FOR_PRODUCTS);
   static final CollectionReference specialOrderCollectionReference =
-      FirebaseFirestore.instance
-          .collection(FirebaseConstant.COLLECTION_FOR_SPECIAL_ORDERS);
+  FirebaseFirestore.instance
+      .collection(FirebaseConstant.COLLECTION_FOR_SPECIAL_ORDERS);
   static final CollectionReference orderCollectionReference = FirebaseFirestore
       .instance
       .collection(FirebaseConstant.COLLECTION_FOR_ORDERS);
 
-  Future<void> authenticationUser(
-      BuildContext context, String email, String password) async {
+  Future<void> authenticationUser(BuildContext context, String email,
+      String password) async {
     try {
       HelperUtils.showCircularProgressDialog(context);
       var result = await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -57,7 +58,7 @@ class FirebaseDatabaseService {
         MaterialPageRoute(
           builder: (_) => const DashboardScreen(),
         ),
-        (route) => false,
+            (route) => false,
       );
     });
   }
@@ -101,8 +102,8 @@ class FirebaseDatabaseService {
     }
   }
 
-  void onRegistrationSuccess(BuildContext context, User user, String name,
-      String phone, String password, String address) {
+  Future<void> onRegistrationSuccess(BuildContext context, User user, String name,
+      String phone, String password, String address) async {
     log('Authentication successful');
 
     UserModel userModel = UserModel(
@@ -112,10 +113,11 @@ class FirebaseDatabaseService {
         email: user.email.toString(),
         password: password,
         address: address,
-        token: "Not Available",
+        token: await NotificationHelper().token(),
         active: false,
         lastSeen: DateTime.now(),
-        createdAt: DateTime.now());
+        createdAt: DateTime.now()
+    );
     Map<String, dynamic> userMap = userModel.toMap();
     log("UserData: $userMap");
 
@@ -123,7 +125,7 @@ class FirebaseDatabaseService {
       customerCollectionReference.doc(user.uid).set(userMap);
       Future.delayed(
         const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
-        () {
+            () {
           Navigator.pop(context); // Dismiss the progress dialog
           TextEditingControllers.name.clear();
           TextEditingControllers.phone.clear();
@@ -211,7 +213,7 @@ class FirebaseDatabaseService {
         seconds: 5,
         title: "Password reset request sent",
         message:
-            "You have received an email to update your password. Please review it.",
+        "You have received an email to update your password. Please review it.",
       );
     });
   }
@@ -256,32 +258,33 @@ class FirebaseDatabaseService {
     customerCollectionReference
         .doc(currentUser!.uid)
         .update(updateData)
-        .then((value) async => {
-              log("User Updated"),
-              // If isActive is false, sign out user and navigate to login screen
-              if (isActive == false)
-                {
-                  log("User Logout"),
-                  HelperUtils.showSnackBar(
-                    context: context,
-                    isSuccess: true,
-                    title: "Signing out",
-                    message: "See you soon!",
-                  ),
-                  await _auth.signOut(),
-                  Future.delayed(
-                      const Duration(
-                          seconds: FirebaseConstant.RESPONSE_DELAY_TIME), () {
-                    Navigator.pop(context); // Dismiss the progress dialog
+        .then((value) async =>
+    {
+      log("User Updated"),
+      // If isActive is false, sign out user and navigate to login screen
+      if (isActive == false)
+        {
+          log("User Logout"),
+          HelperUtils.showSnackBar(
+            context: context,
+            isSuccess: true,
+            title: "Signing out",
+            message: "See you soon!",
+          ),
+          await _auth.signOut(),
+          Future.delayed(
+              const Duration(
+                  seconds: FirebaseConstant.RESPONSE_DELAY_TIME), () {
+            Navigator.pop(context); // Dismiss the progress dialog
 
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  }),
-                }
-            })
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+            );
+          }),
+        }
+    })
         .catchError((error) => log("Failed to update user: $error"));
   }
 
@@ -306,8 +309,9 @@ class FirebaseDatabaseService {
       productCollectionReference.doc(productModel.id).set(productMap);
       Future.delayed(
         const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
-        () {
+            () {
           Navigator.pop(context);
+
           TextEditingControllers.productName.clear();
           TextEditingControllers.productDetails.clear();
           TextEditingControllers.productPrice.clear();
@@ -340,8 +344,7 @@ class FirebaseDatabaseService {
     }
   }
 
-  addSpecialOrderToFireStore(
-      BuildContext context,
+  addSpecialOrderToFireStore(BuildContext context,
       String name,
       String phone,
       String email,
@@ -371,7 +374,7 @@ class FirebaseDatabaseService {
           .set(specialOrderMap);
       Future.delayed(
         const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
-        () {
+            () {
           Navigator.pop(context);
           TextEditingControllers.name.clear();
           TextEditingControllers.phone.clear();
@@ -411,19 +414,17 @@ class FirebaseDatabaseService {
     }
   }
 
-  addOrderToFireStore(
-    BuildContext context,
-    String productName,
-    String productDetail,
-    String productPrice,
-    String productPicture,
-    String orderPrice,
-    String numberOfPersons,
-  ) async {
+  addOrderToFireStore(BuildContext context,
+      String productName,
+      String productDetail,
+      String productPrice,
+      String productPicture,
+      String orderPrice,
+      String numberOfPersons,) async {
     HelperUtils.showCircularProgressDialog(context);
 
     customerCollectionReference.doc(currentUser!.uid).get().then(
-      (DocumentSnapshot documentSnapshot) {
+          (DocumentSnapshot documentSnapshot) {
         if (documentSnapshot.exists) {
           log('Document data: ${documentSnapshot.data()}');
           //Navigator.pop(context);
@@ -451,7 +452,7 @@ class FirebaseDatabaseService {
             orderCollectionReference.doc(orderModel.orderId).set(orderMap);
             Future.delayed(
               const Duration(seconds: FirebaseConstant.RESPONSE_DELAY_TIME),
-              () {
+                  () {
                 Navigator.pop(context);
 
                 HelperUtils.showSnackBar(
@@ -481,8 +482,8 @@ class FirebaseDatabaseService {
     );
   }
 
-   updateOrderStatusByAdmin(
-      BuildContext context, String orderId, String status) {
+  updateOrderStatusByAdmin(BuildContext context, String orderId,
+      String status) {
     // Define data to be updated
     Map<String, dynamic> updateData = {
       'orderStatus': status,
@@ -491,38 +492,77 @@ class FirebaseDatabaseService {
     orderCollectionReference
         .doc(orderId)
         .update(updateData)
-        .then((value) async => {
-              log("Status Updated"),
-               Navigator.pop(context),
-              if (status.contains("Rejected"))
-                {
-                  HelperUtils.showSnackBar(
-                    context: context,
-                    isSuccess: false,
-                    title: "Order Reject",
-                    message: "Order Rejected Successfully",
-                  ),
-                  
-                }
-              else if (status.contains("Delivered"))
-                {
-                  HelperUtils.showSnackBar(
-                    context: context,
-                    isSuccess: true,
-                    title: "Order Deliverer",
-                    message: "Order is ready to go",
-                  ),
-                }
-              else
-                {
-                  HelperUtils.showSnackBar(
-                    context: context,
-                    isSuccess: true,
-                    title: "Order Accepted",
-                    message: "Order Accepted Successfully",
-                  ),
-                }
-            })
+        .then((value) async =>
+    {
+      log("Status Updated"),
+      Navigator.pop(context),
+      if (status.contains("Rejected"))
+        {
+          HelperUtils.showSnackBar(
+            context: context,
+            isSuccess: false,
+            title: "Order Reject",
+            message: "Order Rejected Successfully",
+          ),
+
+        }
+      else
+        if (status.contains("Delivered"))
+          {
+            HelperUtils.showSnackBar(
+              context: context,
+              isSuccess: true,
+              title: "Order Deliverer",
+              message: "Order is ready to go",
+            ),
+          }
+        else
+          {
+            HelperUtils.showSnackBar(
+              context: context,
+              isSuccess: true,
+              title: "Order Accepted",
+              message: "Order Accepted Successfully",
+            ),
+          }
+    })
         .catchError((error) => log("Failed to update user: $error"));
+  }
+
+
+  Future<bool> pushNotificationsSpecificDevice({
+    required String? token,
+    required String? title,
+    required String? body,
+  }) async {
+    String dataNotifications = '{ "to" : "$token",'
+        ' "notification" : {'
+        ' "title":"$title",'
+        '"body":"$body"'
+        ' }'
+        ' }';
+
+    try {
+      final response = await http.post(
+        Uri.parse(FirebaseConstant.fcmBaseUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key= ${FirebaseConstant.serverKey}',
+        },
+        body: dataNotifications,
+      );
+
+      log('FCM Response Status Code: ${response.statusCode}');
+      log('FCM Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      log('Error sending push notification: $e');
+      return false;
+    }
   }
 }

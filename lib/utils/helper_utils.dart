@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:another_flushbar/flushbar.dart';
 
@@ -59,5 +61,9 @@ class HelperUtils {
       default:
         return AppColors.primaryDark;
     }
+  }
+
+  int generateRandomId() {
+    return Random().nextInt(100);
   }
 }

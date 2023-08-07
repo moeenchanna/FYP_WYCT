@@ -39,8 +39,19 @@ class FirebaseDatabaseService {
     }
   }
 
-  void onAuthenticationSuccess(BuildContext context, User user) {
+  Future<void> onAuthenticationSuccess(BuildContext context, User user) async {
     log('Authentication successful');
+    // Define data to be updated
+    Map<String, dynamic> updateData = {
+      'customerFcmToken': await NotificationHelper().token(),
+    };
+
+    // Update document in collection reference
+    customerCollectionReference
+        .doc(user.uid)
+        .update(updateData)
+        .then((value) => {log("Token Updated: $updateData")})
+        .catchError((error) => log("Failed to update user: $error"));
 
     HelperUtils.showSnackBar(
       context: context,
@@ -483,7 +494,7 @@ class FirebaseDatabaseService {
   }
 
   updateOrderStatusByAdmin(BuildContext context, String orderId,
-      String status) {
+      String status,String customerFcmToken,String productName) {
     // Define data to be updated
     Map<String, dynamic> updateData = {
       'orderStatus': status,
@@ -494,6 +505,11 @@ class FirebaseDatabaseService {
         .update(updateData)
         .then((value) async =>
     {
+   await pushNotificationsSpecificDevice(
+    token: customerFcmToken,
+    title: "Order Alert",
+    body: "Your Order $productName has been $status"),
+
       log("Status Updated"),
       Navigator.pop(context),
       if (status.contains("Rejected"))

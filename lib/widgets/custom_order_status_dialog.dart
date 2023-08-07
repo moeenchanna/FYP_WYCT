@@ -11,9 +11,10 @@ class CustomOrderStatusDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       child: SizedBox(
-        height: 540,
+        height: 560,
         child: Card(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               const Text(
                 "Order Details",
@@ -21,7 +22,7 @@ class CustomOrderStatusDialog extends StatelessWidget {
               ),
               Image.network(
                 data["productPicture"],
-                height: 200,
+                height: 150,
                 width: double.infinity,
                 fit: BoxFit.fill,
               ),
@@ -105,7 +106,11 @@ class CustomOrderStatusDialog extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             FirebaseDatabaseService().updateOrderStatusByAdmin(
-                                context, data["orderId"], "Rejected");
+                                context,
+                                data["orderId"],
+                                "Rejected",
+                                data["customerFcmToken"],
+                                data["productName"]);
                           },
                           icon: const Icon(
                             Icons.cancel_outlined,
@@ -116,7 +121,11 @@ class CustomOrderStatusDialog extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             FirebaseDatabaseService().updateOrderStatusByAdmin(
-                                context, data["orderId"], "Accepted");
+                                context,
+                                data["orderId"],
+                                "Accepted",
+                                data["customerFcmToken"],
+                                data["productName"]);
                           },
                           icon: const Icon(
                             Icons.done_outline_outlined,
@@ -127,7 +136,11 @@ class CustomOrderStatusDialog extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             FirebaseDatabaseService().updateOrderStatusByAdmin(
-                                context, data["orderId"], "Delivered");
+                                context,
+                                data["orderId"],
+                                "Delivered",
+                                data["customerFcmToken"],
+                                data["productName"]);
                           },
                           icon: const Icon(
                             Icons.delivery_dining_rounded,

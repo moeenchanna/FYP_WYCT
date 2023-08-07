@@ -99,7 +99,7 @@ class NotificationHelper {
   setupLocalNotification() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
     AndroidInitializationSettings(
-      'ic_launcher',
+      '@mipmap/ic_launcher',
     );
     final IOSInitializationSettings initializationSettingsIOS =
     IOSInitializationSettings(
